@@ -9,8 +9,10 @@ pub struct User {
     pub password: String,
 }
 
-#[derive(Deserialize, Serialize, Insertable)]
 #[table_name="users"]
+#[derive(Deserialize, Serialize, Insertable)]
 pub struct NewUser {
     pub name: String,
+    pub email: String,
+    pub password: String
 }

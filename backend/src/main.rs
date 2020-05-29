@@ -8,14 +8,16 @@ extern crate diesel;
 
 use actix_files as fs;
 use actix_cors::Cors;
-use actix_web::{http::header, get, middleware::Logger, post, web, App, Result ,Error, HttpResponse, HttpServer};
+use actix_web::http::{header, Method, StatusCode};
+use actix_web::{get, middleware::Logger, post, web, App, Result ,Error, HttpResponse, HttpServer, Responder};
 use diesel::prelude::*;
 use diesel::r2d2::{self, ConnectionManager};
+use listenfd::ListenFd;
 
 mod actions;
 mod models;
 mod schema;
-mod user;
+// mod user;
 
 // #[actix_rt::main]
 // async fn main() -> std::io::Result<()> {
@@ -48,6 +50,11 @@ async fn favicon() -> Result<fs::NamedFile> {
 }
 
 type DbPool = r2d2::Pool<ConnectionManager<PgConnection>>;
+
+/// 404 handler
+async fn p404() -> Result<fs::NamedFile> {
+    Ok(fs::NamedFile::open("static/404.html")?.set_status_code(StatusCode::NOT_FOUND))
+}
 
 /// Finds user by UID.
 #[get("/user/{user_id}")]
@@ -82,9 +89,11 @@ async fn add_user(
     form: web::Json<models::NewUser>,
 ) -> Result<HttpResponse, Error> {
     let conn = pool.get().expect("couldn't get db connection from pool");
+    // println!("uhouho");
+    // let user = actions::insert_new_user(&form.name, &conn);
 
     // use web::block to offload blocking Diesel code without blocking server thread
-    let user = web::block(move || actions::insert_new_user(&form.name, &conn))
+    let user = web::block(move || actions::insert_new_user(&form.name, &form.email, &form.password , &conn))
         .await
         .map_err(|e| {
             eprintln!("{}", e);
@@ -92,6 +101,15 @@ async fn add_user(
         })?;
 
     Ok(HttpResponse::Ok().json(user))
+}
+
+#[post("/test")]
+async fn post_test(
+) -> Result<HttpResponse, Error> {
+    Ok(HttpResponse::Ok()
+        .header("Content-Type", "text/plain")
+        .body("Post成功")
+    )
 }
 
 #[actix_rt::main]
@@ -107,20 +125,29 @@ async fn main() -> std::io::Result<()> {
         .build(manager)
         .expect("Failed to create pool.");
 
-    let bind = "127.0.0.1:8000";
+    let bind = "127.0.0.1:3000";
+    let mut listenfd = ListenFd::from_env();
 
     println!("Starting server at: {}", &bind);
 
     // Start HTTP server
-    HttpServer::new(move || {
+    let server = HttpServer::new(move || {
         App::new()
             // set up DB pool to be used with web::Data<Pool> extractor
             .data(pool.clone())
             .wrap(Logger::default())
             .service(get_user)
             .service(add_user)
-    })
-    .bind(&bind)?
-    .run()
-    .await
+            .service(post_test)
+            .default_service(
+                // 404 for GET request
+                web::resource("")
+                    .route(web::get().to(p404)))
+    });
+
+    if let Some(l) = listenfd.take_tcp_listener(0).unwrap() {
+        server.listen(l)?
+    } else {
+        server.bind(&bind)?
+    }.run().await
 }

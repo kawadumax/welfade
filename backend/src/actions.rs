@@ -35,6 +35,8 @@ pub fn find_user_by_id(
 pub fn insert_new_user(
     // prevent collision with `name` column imported inside the function
     _name: &str,
+    _email: &str,
+    _password: &str,
     conn: &PgConnection,
 ) -> Result<models::NewUser, diesel::result::Error> {
     // It is common when using Diesel with Actix web to import schema-related
@@ -43,7 +45,9 @@ pub fn insert_new_user(
     use crate::schema::users::dsl::*;
 
     let new_user = models::NewUser {
-        name: _name.to_owned()
+        name: _name.to_owned(),
+        email: _email.to_owned(),
+        password: _password.to_owned(),
     };
 
     diesel::insert_into(users).values(&new_user).execute(conn)?;
