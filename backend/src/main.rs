@@ -8,8 +8,8 @@ extern crate diesel;
 
 use actix_files as fs;
 use actix_cors::Cors;
-use actix_web::http::{header, Method, StatusCode};
-use actix_web::{get, middleware::Logger, post, web, App, Result ,Error, HttpResponse, HttpServer, Responder};
+use actix_web::http::{header, StatusCode};
+use actix_web::{get, middleware::Logger, post, web, App, Result ,Error, HttpResponse, HttpServer };
 use diesel::prelude::*;
 use diesel::r2d2::{self, ConnectionManager};
 use listenfd::ListenFd;
@@ -17,31 +17,6 @@ use listenfd::ListenFd;
 mod actions;
 mod models;
 mod schema;
-// mod user;
-
-// #[actix_rt::main]
-// async fn main() -> std::io::Result<()> {
-//     std::env::set_var("RUST_LOG", "actix_web=info");
-//     env_logger::init();
-
-//     HttpServer::new(move || {
-//         App::new()
-//             .wrap(
-//                 Cors::new()
-//                     .allowed_origin("http://localhost:8080")
-//                     .allowed_methods(vec!["GET", "POST"])
-//                     .allowed_headers(vec![header::AUTHORIZATION, header::ACCEPT])
-//                     .allowed_header(header::CONTENT_TYPE)
-//                     .max_age(3600)
-//                     .finish(),
-//             )
-//             .wrap(Logger::default())
-//             .service(web::resource("/user/info").route(web::post().to(user::info)))
-//     })
-//     .bind("127.0.0.1:8000")?
-//     .run()
-//     .await
-// }
 
 /// favicon handler
 #[get("/favicon")]
@@ -89,8 +64,6 @@ async fn add_user(
     form: web::Json<models::NewUser>,
 ) -> Result<HttpResponse, Error> {
     let conn = pool.get().expect("couldn't get db connection from pool");
-    // println!("uhouho");
-    // let user = actions::insert_new_user(&form.name, &conn);
 
     // use web::block to offload blocking Diesel code without blocking server thread
     let user = web::block(move || actions::insert_new_user(&form.name, &form.email, &form.password , &conn))
@@ -101,15 +74,6 @@ async fn add_user(
         })?;
 
     Ok(HttpResponse::Ok().json(user))
-}
-
-#[post("/test")]
-async fn post_test(
-) -> Result<HttpResponse, Error> {
-    Ok(HttpResponse::Ok()
-        .header("Content-Type", "text/plain")
-        .body("Post成功")
-    )
 }
 
 #[actix_rt::main]
@@ -136,9 +100,18 @@ async fn main() -> std::io::Result<()> {
             // set up DB pool to be used with web::Data<Pool> extractor
             .data(pool.clone())
             .wrap(Logger::default())
+            .wrap(
+                Cors::new()
+                    .allowed_origin("http://localhost:8080")
+                    .allowed_methods(vec!["GET", "POST"])
+                    .allowed_headers(vec![header::AUTHORIZATION, header::ACCEPT])
+                    .allowed_header(header::CONTENT_TYPE)
+                    .max_age(3600)
+                    .finish()
+            )
+            .wrap(Logger::default())
             .service(get_user)
             .service(add_user)
-            .service(post_test)
             .default_service(
                 // 404 for GET request
                 web::resource("")
