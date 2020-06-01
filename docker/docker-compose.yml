@@ -1,0 +1,21 @@
+version: '3'
+services:
+  db:
+    build: postgres
+    volumes:
+      # コンテナの `/var/lib/postgresql/data` を、volume `db-data` にマウントする。
+      - "welfade-data:/var/lib/postgresql/data"
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: welfade
+      POSTGRES_USER: welfade
+      POSTGRES_PASSWORD: password
+      # volumes を定義する
+volumes:
+  # volume の名前を指定
+  welfade-data:
+    # Compose の外ですでに作成済みの volume を指定する場合は ture を設定する。
+    # そうすると、 docker-compose up 時に Compose は volume を作成しようとしません。
+    # かつ、指定した volume が存在しないとエラーを raise します。
+    # external: true
