@@ -13,7 +13,7 @@ import Vue from "vue";
 
 // @ is an alias to /src
 export default Vue.extend({
-  name: "Login",
+  name: "Signin",
   components: {
     // HelloWorld
   },

@@ -27,7 +27,7 @@ export type Data = {
 
 // @ is an alias to /src
 export default Vue.extend({
-  name: "Login",
+  name: "Signup",
   components: {
     // HelloWorld
   },
