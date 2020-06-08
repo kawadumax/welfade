@@ -16,7 +16,6 @@ export type Data = {
 export default Vue.extend({
   name: 'Home',
   created(): void {
-    console.log("Created!!!")
     this.$axios.get("http://127.0.0.1:3000/user/2")
       .then(response => {
         console.log('status:', response.status) // 200
