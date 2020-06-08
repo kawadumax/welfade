@@ -62,14 +62,13 @@ export default Vue.extend({
   methods: {
     submit(){
       console.log("Submit")
-      this.$axios.post("http://127.0.0.1:3000/user", {
+      this.$axios.post("/user", {
         name: this.name,
         email: this.email,
         password: this.password
       }).then(response => {
         console.log('status:', response.status) // 200
         console.log('body:', response.data)     // response body.)
-        this.user = response.data
       }).catch(err => {
         console.log('err:', err);
       })
