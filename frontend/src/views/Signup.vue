@@ -69,6 +69,7 @@ export default Vue.extend({
       }).then(response => {
         console.log('status:', response.status) // 200
         console.log('body:', response.data)     // response body.)
+        this.$router.push({ path: '/' })
       }).catch(err => {
         console.log('err:', err);
       })
