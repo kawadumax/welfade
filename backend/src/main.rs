@@ -26,11 +26,6 @@ async fn favicon() -> Result<fs::NamedFile> {
 
 type DbPool = r2d2::Pool<ConnectionManager<PgConnection>>;
 
-/// 404 handler
-async fn p404() -> Result<fs::NamedFile> {
-    Ok(fs::NamedFile::open("static/404.html")?.set_status_code(StatusCode::NOT_FOUND))
-}
-
 /// Finds user by UID.
 #[get("/user/{user_id}")]
 async fn get_user(
@@ -112,10 +107,6 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             .service(get_user)
             .service(add_user)
-            .default_service(
-                // 404 for GET request
-                web::resource("")
-                    .route(web::get().to(p404)))
     });
 
     if let Some(l) = listenfd.take_tcp_listener(0).unwrap() {
