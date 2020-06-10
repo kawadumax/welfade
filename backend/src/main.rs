@@ -18,12 +18,6 @@ mod actions;
 mod models;
 mod schema;
 
-/// favicon handler
-#[get("/favicon")]
-async fn favicon() -> Result<fs::NamedFile> {
-    Ok(fs::NamedFile::open("static/favicon.ico")?)
-}
-
 type DbPool = r2d2::Pool<ConnectionManager<PgConnection>>;
 
 /// Finds user by UID.

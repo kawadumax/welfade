@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use serde::{ Deserialize, Serialize };
 use crate::schema::users;
 
 #[derive(Deserialize, Serialize, Queryable)]
