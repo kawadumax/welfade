@@ -1,7 +1,8 @@
- 
 use diesel::prelude::*;
-use crate::models;
+use diesel::r2d2::{self, ConnectionManager};
+use crate::gateway::models;
 
+pub type DbPool = r2d2::Pool<ConnectionManager<PgConnection>>;
 pub fn find_user_by_id(
     _id: i32,
     conn: &PgConnection,

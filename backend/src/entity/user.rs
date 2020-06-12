@@ -4,9 +4,3 @@ pub struct User {
     pub email: String,
     pub password: String,
 }
-
-pub struct NewUser {
-    pub name: String,
-    pub email: String,
-    pub password: String,
-}
