@@ -9,9 +9,9 @@ use crate::gateway::models;
 #[get("/user/{user_id}")]
 pub async fn get_user(
     pool: web::Data<DbPool>,
-    info: web::Path<i32>,
+    params: web::Path<i32>,
 ) -> Result<HttpResponse, Error> {
-    let user_id = info.into_inner();
+    let user_id = params.into_inner();
     let conn = pool.get().expect("couldn't get db connection from pool");
 
     // use web::block to offload blocking Diesel code without blocking server thread
@@ -35,7 +35,7 @@ pub async fn get_user(
 #[post("/user")]
 pub async fn add_user(
     pool: web::Data<DbPool>,
-    form: web::Json<models::NewUser>,
+    form: web::Json<models::NewUserModel>,
 ) -> Result<HttpResponse, Error> {
     let conn = pool.get().expect("couldn't get db connection from pool");
 

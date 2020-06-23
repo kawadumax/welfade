@@ -1,4 +1,4 @@
-use crate::entity::user::User;
+use crate::entity::user::UserEntity as User;
 
 // TODO: usecaseでactixをuseすべきでない
 use actix_web::Result;

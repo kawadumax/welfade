@@ -19,8 +19,6 @@ mod database;
 mod schema;
 mod gateway;
 
-type DbPool = r2d2::Pool<ConnectionManager<PgConnection>>;
-
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=info");
@@ -38,23 +36,23 @@ async fn main() -> std::io::Result<()> {
     let mut listenfd = ListenFd::from_env();
 
     println!("Starting server at: {}", &bind);
-
     // Start HTTP server
     let server = HttpServer::new(move || {
+
+        let connspec = std::env::var("DATABASE_URL").expect("DATABASE_URL");
+        let cors = Cors::new()
+            .allowed_origin("http://localhost:8080")
+            .allowed_methods(vec!["GET", "POST"])
+            .allowed_headers(vec![header::AUTHORIZATION, header::ACCEPT])
+            .allowed_header(header::CONTENT_TYPE)
+            .max_age(3600)
+            .finish();
+
         App::new()
             // set up DB pool to be used with web::Data<Pool> extractor
             .data(pool.clone())
             .wrap(Logger::default())
-            .wrap(
-                Cors::new()
-                    .allowed_origin("http://localhost:8080")
-                    .allowed_methods(vec!["GET", "POST"])
-                    .allowed_headers(vec![header::AUTHORIZATION, header::ACCEPT])
-                    .allowed_header(header::CONTENT_TYPE)
-                    .max_age(3600)
-                    .finish()
-            )
-            .wrap(Logger::default())
+            .wrap(cors)
             .service(rest::get_user)
             .service(rest::add_user)
     });
