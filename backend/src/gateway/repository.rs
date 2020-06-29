@@ -1,12 +1,10 @@
-use crate::gateway::models::NewUserModel;
-use crate::gateway::models::UserModel;
-// actixをここでuseしたくない
-use actix_web::Result;
+use crate::gateway::models;
 
 pub trait Repository {
     // add code here
-    fn find_user_by_id(user_id: UserModel) -> Option<UserModel>;
+    type FindUserResponse;
+    fn find_user_by_id(user_id: models::UserIdModel) -> Self::FindUserResponse;
 
-    /// Run query using Diesel to insert a new database row and return the result.
-    fn insert_new_user(new_user: NewUserModel) -> Result<UserModel>;
+    type InsertUserResponse;
+    fn insert_new_user(new_user: models::NewUserModel) -> Self::InsertUserResponse;
 }

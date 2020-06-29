@@ -8,8 +8,6 @@ extern crate diesel;
 use actix_cors::Cors;
 use actix_web::http::{header};
 use actix_web::{middleware::Logger, App, HttpServer };
-use diesel::prelude::*;
-use diesel::r2d2::{self, ConnectionManager};
 use listenfd::ListenFd;
 
 mod entity;
@@ -24,13 +22,6 @@ async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=info");
     env_logger::init();
     dotenv::dotenv().ok();
-
-    // set up database connection pool
-    let connspec = std::env::var("DATABASE_URL").expect("DATABASE_URL");
-    let manager = ConnectionManager::<PgConnection>::new(connspec);
-    let pool = r2d2::Pool::builder()
-        .build(manager)
-        .expect("Failed to create pool.");
 
     let bind = "127.0.0.1:3000";
     let mut listenfd = ListenFd::from_env();
@@ -49,8 +40,6 @@ async fn main() -> std::io::Result<()> {
             .finish();
 
         App::new()
-            // set up DB pool to be used with web::Data<Pool> extractor
-            .data(pool.clone())
             .wrap(Logger::default())
             .wrap(cors)
             .service(rest::get_user)

@@ -1,21 +1,23 @@
 use actix_web::{get, post, web, Result ,Error, HttpResponse};
-// DBPoolは注入、メソッドはtraitだけ参照したい
-use crate::database::postgres::DbPool;
-use crate::database::postgres;
+
+use crate::database::postgres::PostgresManager;
 use crate::gateway::models;
+use crate::gateway::repository::Repository;
 
+// #[derive(Debug)]
+struct RestManager {
+    db_manager: PostgresManager
+}
 
-/// Finds user by UID.
 #[get("/user/{user_id}")]
 pub async fn get_user(
-    pool: web::Data<DbPool>,
     params: web::Path<i32>,
 ) -> Result<HttpResponse, Error> {
     let user_id = params.into_inner();
-    let conn = pool.get().expect("couldn't get db connection from pool");
+
 
     // use web::block to offload blocking Diesel code without blocking server thread
-    let user = web::block(move || postgres::find_user_by_id(user_id, &conn))
+    let user = web::block(move || PostgresManager::find_user_by_id(user_id))
         .await
         .map_err(|e| {
             eprintln!("{}", e);
@@ -34,13 +36,10 @@ pub async fn get_user(
 /// Inserts new user with name defined in form.
 #[post("/user")]
 pub async fn add_user(
-    pool: web::Data<DbPool>,
-    form: web::Json<models::NewUserModel>,
+    params: web::Json<models::NewUserModel>,
 ) -> Result<HttpResponse, Error> {
-    let conn = pool.get().expect("couldn't get db connection from pool");
-
     // use web::block to offload blocking Diesel code without blocking server thread
-    let user = web::block(move || postgres::insert_new_user(&form.name, &form.email, &form.password , &conn))
+    let user = web::block(move || PostgresManager::insert_new_user(params.into_inner()))
         .await
         .map_err(|e| {
             eprintln!("{}", e);

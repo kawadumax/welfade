@@ -1,11 +1,12 @@
 use serde::{ Deserialize, Serialize };
 use crate::schema::users;
-use crate::entity::user::UserEntity;
 use crate::entity::user::UserIdEntity;
+
+pub type UserIdModel = UserIdEntity;
 
 #[derive(Deserialize, Serialize, Queryable)]
 pub struct UserModel {
-    pub id: UserIdEntity,
+    pub id: UserIdModel,
     pub name: String,
     pub email: String,
     pub password: String    
