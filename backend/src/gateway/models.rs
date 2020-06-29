@@ -4,7 +4,7 @@ use crate::entity::user::UserIdEntity;
 
 pub type UserIdModel = UserIdEntity;
 
-#[derive(Deserialize, Serialize, Queryable)]
+#[derive(Deserialize, Serialize, Queryable, Debug)]
 pub struct UserModel {
     pub id: UserIdModel,
     pub name: String,
@@ -15,7 +15,7 @@ pub struct UserModel {
 
 
 #[table_name="users"]
-#[derive(Deserialize, Serialize, Insertable)]
+#[derive(Deserialize, Serialize, Insertable, Debug)]
 pub struct NewUserModel {
     pub name: String,
     pub email: String,

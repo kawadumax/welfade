@@ -10,6 +10,7 @@ pub struct PostgresManager {
     pub db_pool: DbPool
 }
 
+// DBへの接続情報を実行時にstatic変数に格納する
 lazy_static! {
     pub static ref DB_MANAGER: PostgresManager = PostgresManager {
         db_pool: r2d2::Pool::builder().build(
@@ -21,7 +22,6 @@ lazy_static! {
 }
 
 impl Repository for PostgresManager {
-    // add code here
 
     type FindUserResponse = Result<Option<models::UserModel>, diesel::result::Error>;
     fn find_user_by_id(_id: i32) -> Self::FindUserResponse {

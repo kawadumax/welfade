@@ -29,8 +29,6 @@ async fn main() -> std::io::Result<()> {
     println!("Starting server at: {}", &bind);
     // Start HTTP server
     let server = HttpServer::new(move || {
-
-        let connspec = std::env::var("DATABASE_URL").expect("DATABASE_URL");
         let cors = Cors::new()
             .allowed_origin("http://localhost:8080")
             .allowed_methods(vec!["GET", "POST"])

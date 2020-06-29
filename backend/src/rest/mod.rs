@@ -4,11 +4,6 @@ use crate::database::postgres::PostgresManager;
 use crate::gateway::models;
 use crate::gateway::repository::Repository;
 
-// #[derive(Debug)]
-struct RestManager {
-    db_manager: PostgresManager
-}
-
 #[get("/user/{user_id}")]
 pub async fn get_user(
     params: web::Path<i32>,
@@ -39,6 +34,8 @@ pub async fn add_user(
     params: web::Json<models::NewUserModel>,
 ) -> Result<HttpResponse, Error> {
     // use web::block to offload blocking Diesel code without blocking server thread
+    println!("add_user");
+    dbg!(&params);
     let user = web::block(move || PostgresManager::insert_new_user(params.into_inner()))
         .await
         .map_err(|e| {
