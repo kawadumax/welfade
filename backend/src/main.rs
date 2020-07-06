@@ -8,7 +8,6 @@ extern crate diesel;
 use actix_cors::Cors;
 use actix_web::http::{header};
 use actix_web::{middleware::Logger, App, HttpServer };
-use listenfd::ListenFd;
 
 mod entity;
 mod usecase;
@@ -23,14 +22,17 @@ async fn main() -> std::io::Result<()> {
     env_logger::init();
     dotenv::dotenv().ok();
 
-    let bind = "127.0.0.1:3000";
-    let mut listenfd = ListenFd::from_env();
+    let host = std::env::var("BIND_HOST").expect(".envファイルからBIND_HOSTを取得できませんでした。");
+    let port = std::env::var("BIND_PORT").expect(".envファイルからBIND_PORTを取得できませんでした。");
+        
+    let bind = format!("{}:{}", host, port);
 
     println!("Starting server at: {}", &bind);
     // Start HTTP server
     let server = HttpServer::new(move || {
+        let cors_url = std::env::var("CORS_URL").expect(".envファイルからCORS_URLを取得できませんでした。");
         let cors = Cors::new()
-            .allowed_origin("http://localhost:8080")
+            .allowed_origin(&cors_url)
             .allowed_methods(vec!["GET", "POST"])
             .allowed_headers(vec![header::AUTHORIZATION, header::ACCEPT])
             .allowed_header(header::CONTENT_TYPE)
@@ -42,11 +44,8 @@ async fn main() -> std::io::Result<()> {
             .wrap(cors)
             .service(rest::get_user)
             .service(rest::add_user)
-    });
+            .service(rest::ping)
+    }).bind(&bind)?;
 
-    if let Some(l) = listenfd.take_tcp_listener(0).unwrap() {
-        server.listen(l)?
-    } else {
-        server.bind(&bind)?
-    }.run().await
+    server.run().await
 }

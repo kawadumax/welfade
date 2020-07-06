@@ -12,12 +12,15 @@ pub struct UserModel {
     pub password: String    
 }
 
-
-
 #[table_name="users"]
 #[derive(Deserialize, Serialize, Insertable, Debug)]
 pub struct NewUserModel {
     pub name: String,
     pub email: String,
     pub password: String
+}
+
+#[derive(Debug, Serialize)]
+pub struct Pong {
+    pub body: String
 }

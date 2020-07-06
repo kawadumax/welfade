@@ -4,6 +4,12 @@ use crate::database::postgres::PostgresManager;
 use crate::gateway::models;
 use crate::gateway::repository::Repository;
 
+#[get("/ping")]
+pub async fn ping() -> Result<HttpResponse, Error> {
+    let pong = models::Pong { body: "pong".to_owned()};
+    Ok(HttpResponse::Ok().json(pong))
+}
+
 #[get("/user/{user_id}")]
 pub async fn get_user(
     params: web::Path<i32>,

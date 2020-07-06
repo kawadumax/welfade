@@ -1,9 +1,21 @@
 version: '3'
 services:
-  db:
-    build: postgres
+  actix:
+    build: actix
+    image: welfade-actix
+    tty: true
     volumes:
-      # コンテナの `/var/lib/postgresql/data` を、volume `db-data` にマウントする。
+      - ../backend:/actix
+    ports:
+      - 3000:80
+    depends_on:
+      - postgres
+    command: cargo watch -x run
+  postgres:
+    build: postgres
+    image: welfade-postgres
+    volumes:
+      # コンテナの `/var/lib/postgresql/data` を、volume `welfade-data` にマウントする。
       - "welfade-data:/var/lib/postgresql/data"
     ports:
       - 5432:5432
