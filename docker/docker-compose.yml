@@ -1,5 +1,6 @@
 version: '3'
 services:
+  
   actix:
     build: actix
     image: welfade-actix
@@ -11,6 +12,7 @@ services:
     depends_on:
       - postgres
     command: cargo watch -x run
+
   postgres:
     build: postgres
     image: welfade-postgres
@@ -23,10 +25,20 @@ services:
       POSTGRES_DB: welfade
       POSTGRES_USER: welfade
       POSTGRES_PASSWORD: password
+  vue:
+    build: ./vue # dockerfileの場所
+    ports:
+      - 8080:8080
+    command: yarn serve
+    volumes: # ホスト共有フォルダ : ゲスト共有フォルダ
+      - ../frontend:/vue
+      - node_modules:/vue/node_modules
+
       # volumes を定義する
 volumes:
   # volume の名前を指定
   welfade-data:
+  node_modules:
     # Compose の外ですでに作成済みの volume を指定する場合は ture を設定する。
     # そうすると、 docker-compose up 時に Compose は volume を作成しようとしません。
     # かつ、指定した volume が存在しないとエラーを raise します。
