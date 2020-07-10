@@ -1,7 +1,28 @@
 <template>
   <v-app>
-    <v-app-bar :app="true">
-      <v-app-bar-nav-icon></v-app-bar-nav-icon>
+
+    <v-navigation-drawer app v-model="drawer">
+      <v-list-item>
+        <v-list-item-title class="title">Application</v-list-item-title>
+        <v-btn icon>
+          <v-icon>mdi-chevron-left</v-icon>
+        </v-btn>
+      </v-list-item>
+      <v-divider />
+      <v-list nav>
+        <v-list-item v-for="menu in menus" :key="menu.title" :to="menu.url">
+          <v-list-item-icon>
+            <v-icon>{{ menu.icon }}</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>{{ menu.title }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+
+    <v-app-bar app>
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
 
       <v-toolbar-title>就労移行支援情報管理システム Welfade</v-toolbar-title>
 
@@ -29,11 +50,6 @@
         </v-list>
       </v-menu>
     </v-app-bar>
-
-    <v-navigation-drawer :app="true">
-      <!-- -->
-    </v-navigation-drawer>
-
     <!-- Sizes your content based upon application components -->
     <v-content>
       <!-- Provides the application the proper gutter -->
@@ -55,7 +71,13 @@ import Vue from "vue";
 export default Vue.extend({
   name: "App",
   data: () => ({
-    //
+    drawer: false,
+    menus: [
+      { title: 'Index', icon: 'mdi-web', url: '/' },
+      { title: 'Home', icon: 'mdi-home', url: '/home' },
+      { title: 'Favorites', icon: 'mdi-heart', url: '/favorites' },
+      { title: 'About', icon: 'mdi-information-variant', url: '/about' }
+    ]
   })
 });
 </script>

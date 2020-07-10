@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <img alt="Vue logo" src="@/assets/logo.png">
-    <p>{{user}}</p>
+    <p>{{ping}}</p>
   </div>
 </template>
 
@@ -10,27 +10,27 @@ import Vue from "vue"
 // @ is an alias to /src
 
 export type Data = {
-  user: string
+  ping: string
 }
 
 export default Vue.extend({
   name: 'Home',
   created(): void {
-    this.$axios.get("/user/2")
+    this.$axios.get("/ping")
       .then(response => {
         console.log('status:', response.status) // 200
         console.log('body:', response.data)     // response body.)
-        this.user = response.data
+        this.ping = response.data
       })
       .catch(err => {
-        console.log('err:', err);
+        this.ping = 'err:' + err;
     })
   },
   components: {
   },
   data(): Data {
     return {
-      user: "hoge",
+      ping: "",
     }
   }
 
