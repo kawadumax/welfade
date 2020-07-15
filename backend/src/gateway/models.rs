@@ -9,7 +9,8 @@ pub struct UserModel {
     pub id: UserIdModel,
     pub name: String,
     pub email: String,
-    pub password: String    
+    pub password: String,
+    pub sesstion_token: Option<String>
 }
 
 #[table_name="users"]
