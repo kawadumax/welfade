@@ -10,7 +10,7 @@ pub struct UserModel {
     pub name: String,
     pub email: String,
     pub password: String,
-    pub sesstion_token: Option<String>
+    pub session_token: Option<String>
 }
 
 #[table_name="users"]
@@ -19,6 +19,18 @@ pub struct NewUserModel {
     pub name: String,
     pub email: String,
     pub password: String
+}
+
+#[derive(Deserialize, Serialize, Queryable, Debug)]
+pub struct NewSessionModel {
+    pub email: String,
+    pub password: String
+}
+
+#[table_name="users"]
+#[derive(Deserialize, Serialize, Insertable, Debug)]
+pub struct NewSessionTokenModel {
+    pub session_token: Option<String>
 }
 
 #[derive(Debug, Serialize)]
